@@ -18,7 +18,7 @@ Model binders are objects in the ASP.NET MVC framework that map data from HTTP r
 .. literalinclude:: model-binding/sample/src/MVCMovie/retro-sample.txt
    :language: html
 
-Although the sample shows just two fields and doesn't even include validation, it takes only a moment to realize that the above code will quickly become repetive and cumbersome to write, even when it's just a few fields. Real world apps often have many fields combined with complex structures. Admittedly, this kind of mapping code is a bit boring to write as well. There are details on what's behind ASP.NET MVC's model binding abstraction in the next section, "How model binding works". 
+The above code quickly becomes repetitive, cumbersome, and error prone to write, even when it's just a few fields. Real world apps often have many fields combined with complex structures. Admittedly, this kind of mapping code is a bit tedious to write as well. 
 
 How model binding works
 -----------------------
@@ -30,7 +30,11 @@ The default model binder compares the sections of the URL with the pattern defin
 
 .. image:: model-binding/_static/routevalues-in-watch-window.png
 
-Since the  routing pattern looks like this, ``{controller=Home}/{action=Index}/{id?}`` (it's the default route), the route parts ``movies/edit/2`` map to the ``Movies`` controller, its ``Edit`` action method, which accepts an argument called ``id``. So the code for the action method should look something like this: 
+Since the  routing pattern looks like this, ``{controller=Home}/{action=Index}/{id?}``, the route ``movies/edit/2`` maps to the ``Movies`` controller, and its ``Edit`` action method. It also accepts an optional ``id`` of 2 as the image shows here:
+
+.. image:: model-binding/_static/model-binding.png
+
+This is due to MVC's use of conventions. So the code for the action method should look something like this: 
 
 .. literalinclude:: model-binding/sample/src/MVCMovie/Controllers/MoviesController.cs
    :language: c#
@@ -38,7 +42,7 @@ Since the  routing pattern looks like this, ``{controller=Home}/{action=Index}/{
    
 .. note:: The strings in the URL are not case sensitive.
 
-Now that routing knows which action method to use, it quickly checks for model binding attributes applied to the action method's arguments. If it finds a model binding attribute it will use the data source specified by the attribute. Otherwise, for each argument (a primitive type for now, more on complex types later), it looks in its data sources for something with a matching name. In the above example the only argument is an integer named `id`, so that is what the binder will look for. Below is a list of the data sources in the order that the model binder looks through them:
+Routing knows which action method to use, so it checks for model binding attributes applied to the action method's arguments. If it finds a model binding attribute it will use the data source specified by the attribute. Otherwise, for each argument (a primitive type for now, more on complex types later), it looks in its data sources for something with a matching name. In the above example the only argument is an integer named `id`, so that is what the binder will look for. Below is a list of the data sources in the order that the model binder looks through them:
  
 #. ``Request.Form``: These are form values that go in the HTTP request using the POST method.
 #. ``RouteData.Values``: Contains information about each segment of the route. Route segments are separated by a forward slash ``/``.
@@ -46,9 +50,11 @@ Now that routing knows which action method to use, it quickly checks for model b
 
 .. note:: Form, RouteData, and QueryStrings are all stored as name-value pairs.
 
-Web Developers work with form and querystring data regardless of the Web server or development environment and languages, so these should be familiar. In the above example, the model binder is will start looking through the Request.Form first for a key named `id`. In this case it didn't find anything, so it moved on to RouteData.Values looking for a key with a name of `id`. In our example, it's a match, since the last portion of the route has a key value of `id`, and it is an integer. Binding happens, and the value of the id parameter becomes 2. If the action method's parameter were a complex type such as the ``Movie`` type, which likely contains both primitive and complex types, MVC's model binder will still handle it nicely. It uses reflection and recursion to traverse the properties of complex types through its tree, and comparing any primitive members' names against the names of keys in data sources. The model binder can bind objects that contain nested objects for multiple levels. 
+In the example, the model binder is loos through the Request.Form first for a key named `id`. In this case it didn't find anything, so it moved on to RouteData.Values looking for a key with a name of `id`. In our example, it's a match, since the last portion of the route has a key value of `id`, and it is an integer. Binding happens, and the value of the id parameter becomes 2. If the action method's parameter were a complex type such as the ``Movie`` type, which likely contains both primitive and complex types, MVC's model binder will still handle it nicely. It uses reflection and recursion to traverse the properties of complex types through its tree, and comparing any primitive members' names against the names of keys in data sources. The model binder can bind objects that contain nested objects for multiple levels. 
 
 .. note:: When the binder finds the first matching name in the data source, it stops looking for more elements matching that name, and moves onto the next property or item in the parameter list. 
+ 
+.. note:: If for some reason binding can't happen, it quietly fails.
  
 Additionally, there are some special data types that ASP.NET MVC must consider when performing model binding:
 
@@ -56,7 +62,7 @@ Additionally, there are some special data types that ASP.NET MVC must consider w
 - ``IFormCollection``: The collection of key-value pairs that represent the form data.
 - Cancelation token: Used to cancel activity in asynchronous controllers.
 
-Once model binding is complete, validation occurs. The default model binders are quite smart, and work great for the vast majority of development scenarios. However, ASP.NET MVC is extensible so if you have unique needs you can customize the built in model binders as you wish.  
+Once model binding is complete, validation occurs. The default model binders are quite smart, and work great for the vast majority of development scenarios. ASP.NET MVC is extensible so if you have unique needs you can customize the built in model binders.  
 
 Customize default model binding behavior with attributes 
 --------------------------------------------------------
@@ -93,7 +99,9 @@ Output formatters:
 - ``StringOutputFormatter``: This formatter handles basic string responses.
 - ``StreamOutputFormatter``: This formatter handles outgoing streams.
 
-ASP.NET selects input formatters based on the Content-Type header and the type of the parameter, unless there is an attribute specifying otherwise. If you'd like to use XML or another format you must configure it in the Startup.cs file. You may have to install a NuGet package for the formatter you want. To see the formatters at runtime, set a breakpoint at the beginning of an action method and investigate the controller's ``ModelBindingContext`` object when in debug mode. You can find ``this``, which refers to the controller, in the Autos window. 
+ASP.NET selects input formatters based on the Content-Type header and the type of the parameter, unless there is an attribute specifying otherwise. If you'd like to use XML or another format you must configure it in the Startup.cs file. You may have to install a NuGet package for the formatter you want. To see the formatters at runtime, set a breakpoint at the beginning of an action method and investigate the controller's ``ModelBindingContext`` object when in debug mode. You can find ``this``, which refers to the controller, in a debug window, as shown here:
+
+.. image:: model-binding/_static/formatters.png 
 
 Resources
 ---------

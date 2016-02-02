@@ -42,7 +42,9 @@
         <div class="form-group">
             <label asp-for="Genre" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="Genre" asp-items="Html.GetEnumSelectList<Genre>()" class="form-control"></select>
+                <select asp-for="Genre" asp-items="Html.GetEnumSelectList<Genre>()" class="form-control">
+                    <option value="">--Select One--</option>
+                </select>
                 <span asp-validation-for="Genre" class="text-danger" />  
                 <span class="text-danger">@Html.ValidationMessageFor(m => m.Genre)</span>                             
             </div>

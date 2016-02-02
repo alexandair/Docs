@@ -1,9 +1,16 @@
-﻿' Classic ASP. The language is VB, because C# didn't even exist yet. Get off my lawn.
+﻿' Classic ASP. The language is VB, because C# didn't even exist yet. 
+' Get off my lawn.
+
 dim firstName as String
 firstName = Request.Form("FirstName")
 dim lastName as String
 lastName = Request.Form("LastName")
 
-// C# with WebForms is so popular I bet most of you reading this can painfully recall writing reams of code like this. 
-if (Request.Form("FirstName") != null) { txtFirstName.Text = Request.Form("FirstName"); }
-if (Request.Form("LastName") != null) { txtLastName.Text = Request.Form("LastName"); }
+// C# with WebForms is so popular I bet most of you reading this
+// can painfully recall writing reams of code like this. 
+if (Request.Form("FirstName") != null) { 
+   txtFirstName.Text = Request.Form("FirstName"); 
+}
+if (Request.Form("LastName") != null) { 
+   txtLastName.Text = Request.Form("LastName"); 
+}

@@ -78,7 +78,7 @@ namespace MVCMovie.Controllers
         // POST: Movies/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Movie movie)
+        public IActionResult Edit([FromQuery] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -119,3 +119,5 @@ namespace MVCMovie.Controllers
         }
     }
 }
+
+
