@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MVCMovie.Models;
 using MVCMovie.Services;
-using Microsoft.AspNet.Mvc;
 
 namespace MVCMovie
 {
@@ -50,8 +49,6 @@ namespace MVCMovie
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
-           // services.AddMvcCore().AddJsonFormatters();
-
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
@@ -60,9 +57,7 @@ namespace MVCMovie
             services.AddEntityFramework()
                 .AddSqlServer()
                 .AddDbContext<MVCMovieContext>(options =>
-                    options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=MVCMovieContext-fb8c0194-d6b8-474c-b286-a352a11a1dd8;Trusted_Connection=True;MultipleActiveResultSets=true"));
- 
-
+                    options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=MVCMovieContext-5153a42c-a6f6-4e0a-a0ea-74115faf9e98;Trusted_Connection=True;MultipleActiveResultSets=true"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,4 +109,3 @@ namespace MVCMovie
         public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 }
-

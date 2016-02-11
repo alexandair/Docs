@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Entity;
-using MVCMovie.Models;
 
 namespace MVCMovie.Models
 {
@@ -12,8 +11,7 @@ namespace MVCMovie.Models
             if (!_created)
             {
                 _created = true;
-                //Database.EnsureDeleted();
-                //Database.EnsureCreated();
+                Database.EnsureCreated();
             }
         }
 
@@ -26,7 +24,5 @@ namespace MVCMovie.Models
         }
 
         public DbSet<Movie> Movie { get; set; }
-
-        public DbSet<Review> Rating { get; set; }
     }
 }
