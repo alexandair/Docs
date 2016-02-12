@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,9 +14,9 @@ namespace MVCMovie.Models
         Horror=4,
         Drama=5,        
         Comedy=6,
-        Family= 7,
-        Romance=8,
-        Classic=9,
-        Western=10
+        Family,
+        Romance=7,
+        Vintage=8,
+        Western=9
     }
 }
