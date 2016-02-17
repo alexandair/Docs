@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Mvc.Xml;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +59,9 @@ namespace MVCMovie
                 .AddSqlServer()
                 .AddDbContext<MVCMovieContext>(options =>
                     options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=MVCMovieContext-5153a42c-a6f6-4e0a-a0ea-74115faf9e98;Trusted_Connection=True;MultipleActiveResultSets=true"));
-        }
+
+
+                  }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -14,7 +14,7 @@ namespace MVCMovie.Models
         public string Title { get; set; }
 
         [Required]
-        [Classic(1970)]
+        [ClassicMovie(1960)]
         public DateTime ReleaseDate { get; set; }
         
         [Required]
@@ -29,7 +29,8 @@ namespace MVCMovie.Models
         [Required]
         public Genre Genre { get; set; }
 
-        [RateOnPublication]       
+        [Required]
+        [FamilyMovie]
         public string Audience { get; set; }
 
         public List<Review> Reviews { get; set; }

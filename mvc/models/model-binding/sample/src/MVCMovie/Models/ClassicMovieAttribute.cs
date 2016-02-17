@@ -40,9 +40,6 @@ namespace MVCMovie.Models
             yield return rule;
         }
     }
-
-
-
 }
 
     
