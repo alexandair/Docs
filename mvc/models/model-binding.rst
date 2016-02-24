@@ -59,7 +59,7 @@ Once model binding is complete, `validation <https://docs.asp.net/projects/mvc/e
 
 Customize model binding behavior with attributes 
 --------------------------------------------------------
-MVC contains several attributes that you can use to direct its default model binding behavior to a different source. For example, you can specify whether binding is required for a field, or if it should never happen at all by using the ``[BindRequired]`` or ``[BindNever]`` attributes. Alternatively, you can override the default data source, and specify the model binder's data source. Below is a list of model binding attributes:
+MVC contains several attributes that you can use to direct its default model binding behavior to a different source. For example, you can specify whether binding is required for a property, or if it should never happen at all by using the ``[BindRequired]`` or ``[BindNever]`` attributes. Alternatively, you can override the default data source, and specify the model binder's data source. Below is a list of model binding attributes:
 
 - ``[BindRequired]``: This attribute adds a model state error if binding cannot occur.
 - ``[BindNever]``: Tells the model binder to never bind to this parameter.
