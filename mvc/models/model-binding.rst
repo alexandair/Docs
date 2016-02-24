@@ -50,16 +50,16 @@ When a parameter is bound, model binding stops looking for parameters with that 
 
 Additionally, there are some special data types that MVC must consider when performing model binding:
 
-- ``IFormFile``, ``IFormFileCollection``: One or more uploaded files that are part of the HTTP request.
+- ``IFormFile``, ``IEnumerable<IFormFIle>``: One or more uploaded files that are part of the HTTP request.
 - ``CancelationToken``: Used to cancel activity in asynchronous controllers.
 
-The model binding system also supports writable properties of types that inherit from ``IEnumerable<IFormFile>``, such as ``IFormFile`` arrays  Files { get; set; } or List<IFormFile> Files { get; set; }.
+These types can be bound to action parameters or to properties on a class type.
 
 Once model binding is complete, `validation <https://docs.asp.net/projects/mvc/en/latest/models/validation.html>`_ occurs. Default model binding works great for the vast majority of development scenarios. It is also extensible so if you have unique needs you can customize the built-in behavior.  
 
 Customize model binding behavior with attributes 
 --------------------------------------------------------
-MVC contains several attributes that you can use to direct its default model binding behavior to a different source. For example, you can specify whether binding is required for a field, or if it should never happen at all by using the ``[BindRequired]`` or ``[BindNever]`` attributes. Alternatively, you can override the default value, and specify the model binder's data source. Below is a list of model binding attributes:
+MVC contains several attributes that you can use to direct its default model binding behavior to a different source. For example, you can specify whether binding is required for a field, or if it should never happen at all by using the ``[BindRequired]`` or ``[BindNever]`` attributes. Alternatively, you can override the default data source, and specify the model binder's data source. Below is a list of model binding attributes:
 
 - ``[BindRequired]``: This attribute adds a model state error if binding cannot occur.
 - ``[BindNever]``: Tells the model binder to never bind to this parameter.
