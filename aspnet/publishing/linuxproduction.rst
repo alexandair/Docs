@@ -43,7 +43,7 @@ Why use a reverse-proxy server?
 
 Kestrel is great for serving dynamic content from ASP.NET, however the web serving parts aren’t as feature rich full-featured servers like IIS, Apache or Nginx. A reverse proxy-server can allow you to offload work like serving static content, caching requests, compressing requests, and SSL termination from the HTTP server. The reverse proxy server may reside on a dedicated machine or may be deployed alongside an HTTP server.
 
-For the purposes of this guide, we are going to use a single instance of Nginx that runs on the same server alongside your HTTP server. However, based on your requirements you may chose a different setup.
+For the purposes of this guide, we are going to use a single instance of Nginx that runs on the same server alongside your HTTP server. However, based on your requirements you may choose a different setup.
 
 Install Nginx
 ~~~~~~~~~~~~~
@@ -90,7 +90,7 @@ We will be modifying the ``/etc/nginx/sites-available/default``, so open it up i
 This is one of the simplest configuration files for Nginx that forwards incoming public traffic on your port ``80`` to a unix socket that your web application will listen on. You can specify this Unix socket in your ``project.json`` file.
 
 .. code-block:: json
-    :caption: project.json (truncated)
+    :caption: project.json
 
     "commands": {
         "web": "Microsoft.AspNet.Server.Kestrel --server.urls http://unix:/var/aspnet/HelloMVC/kestrel.sock",
@@ -100,9 +100,9 @@ This is one of the simplest configuration files for Nginx that forwards incoming
 
     The ``proxy_set_header Connection keep-alive;`` is **required** as a temporary workaround a `known bug in Kestrel <https://github.com/aspnet/KestrelHttpServer/issues/341>`_.
 
-You might want to look at ``etc/nginx/nginx.conf`` to make other necessary changes to your nginx environment to configure your nginx environment.
+You might want to look at ``/etc/nginx/nginx.conf`` to make other necessary changes to your nginx environment to configure your nginx environment.
 
-Once you have completed making changes to your nginx configuration you can run ``sudo nginx -t`` to verify the syntax of your configuration files. If you see any no errors you can ask nginx to pick up the changes by running ``sudo nginx -s reload``.
+Once you have completed making changes to your nginx configuration you can run ``sudo nginx -t`` to verify the syntax of your configuration files. If the configuration file test is successful you can ask nginx to pick up the changes by running ``sudo nginx -s reload``.
 
 
 
@@ -141,14 +141,13 @@ To have supervisor monitor our application, we will add a file to the ``/etc/sup
     stderr_logfile=/var/log/hellomvc.err.log
     stdout_logfile=/var/log/hellomvc.out.log
     environment=ASPNET_ENV=Production
-    user=aspnet
+    user=www-data
     stopsignal=INT
 
 Once you are done editing the configuration file, restart the ``supervisord`` process to change the set of programs controlled by supervisord.
 
 .. code-block:: bash
 
-    #!/bin/sh
     sudo service supervisor stop
     sudo service supervisor start
 
