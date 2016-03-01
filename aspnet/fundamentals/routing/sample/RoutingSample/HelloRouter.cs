@@ -13,14 +13,8 @@ namespace RoutingSample
             {
                 return;
             }
-            try
-            {
-                await context.HttpContext.Response.WriteAsync($"Hi {name}!");
-            }
-            finally
-            {
-                context.IsHandled = true;
-            }
+            await context.HttpContext.Response.WriteAsync($"Hi {name}!");
+            context.IsHandled = true;
         }
 
         public VirtualPathData GetVirtualPath(VirtualPathContext context)

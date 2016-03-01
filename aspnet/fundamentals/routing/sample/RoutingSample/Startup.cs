@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNet.Builder;
+﻿using System.Collections.Generic;
+using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace RoutingSample
 {
@@ -17,12 +19,13 @@ namespace RoutingSample
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app,
+            ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddConsole(minLevel: LogLevel.Verbose);
             app.UseIISPlatformHandler();
 
             var routeBuilder = new RouteBuilder();
-
             routeBuilder.ServiceProvider = app.ApplicationServices;
 
             routeBuilder.Routes.Add(new TemplateRoute(
@@ -30,12 +33,39 @@ namespace RoutingSample
                 "hello/{name:alpha}",
                 app.ApplicationServices.GetService<IInlineConstraintResolver>()));
 
-            app.UseRouter(routeBuilder.Build());
+            var endpoint1 = new DelegateRouter(async (context) =>
+                            await context
+                                .HttpContext
+                                .Response
+                                .WriteAsync("Hello world! Route Values: " +
+                                    string.Join("", context.RouteData.Values)));
 
+            routeBuilder.DefaultHandler = endpoint1;
+
+            routeBuilder.MapRoute(
+                "Track Package Route",
+                "package/{operation:regex(track|create|detonate)}/{id:int}");
+
+            app.UseRouter(routeBuilder.Build());
 
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Hello World!");
+                var dictionary = new RouteValueDictionary
+                {
+                    {"operation","create" },
+                    {"id",123}
+                };
+                var routeCollection = new RouteCollection();
+                routeCollection.Add(routeBuilder.Routes[1]); // "Track Package Route"
+
+                var vpc = new VirtualPathContext(context,
+                    null, dictionary, "Track Package Route");
+
+                context.Response.ContentType = "text/html";
+                await context.Response.WriteAsync("Menu<hr/>");
+                await context.Response.WriteAsync(@"<a href='" +
+                    routeCollection.GetVirtualPath(vpc).VirtualPath +
+                    "'>Create Package 123</a><br/>");
             });
         }
 

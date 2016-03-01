@@ -46,10 +46,10 @@ Routing is configured in the ``Configure`` method in your ``Startup`` class. Cre
   :linenos:
   :dedent: 8
   :language: c#
-  :lines: 21-41
-  :emphasize-lines: 5-6,8-11,13
+  :lines: 21-34
+  :emphasize-lines: 7-8,10-13
   
-You can see on line 11 how ``ApplicationServices`` is used to access the ``IInlineConstraingResolver`` dependency; if this were done from a ``RouteBuilder`` extension method, access to the services would be done through the ``ServiceProvider`` property.
+You can see on line 13 how ``ApplicationServices`` is used to access the ``IInlineConstraingResolver`` dependency; if this were done from a ``RouteBuilder`` extension method, access to the services would be done through the ``ServiceProvider`` property.
 
 Once you've finished adding routes to the ``RouteBuilder`` instance, call ``UseRouter`` and pass it the result of the ``RouteBuilder.Build`` method.
 
@@ -181,21 +181,69 @@ Adding a colon ``:`` after the name allows additional contraints to be set on a 
 	* - ``any|regex|value``
 	  - {foo:a|b|c}
 	  - a
-	  - If the contraint isn't known, it is treated as a regex.
+	  - If the contraint isn't known, it is treated as a regex (if provided in the constraints dictionary - not within a template)
 
-.. tip:: Any contraint that is provided but which doesn't match a known contraint will be treated as an inline regular expression. A common use for this is to contrain a parameter to a known set of possible values, like so: ``{action:list|get|create}``. This would only match the ``action`` route value to ``list``, ``get``, or ``create``.
+.. tip:: To constrain a parameter to a known set of possible values, you can use a regex: ``{action:regex(list|get|create)}``. This would only match the ``action`` route value to ``list``, ``get``, or ``create``. If passed into the contraints dictionary, the string "list|get|create" would be equivalent.
 
 Contraints can be *chained*, so you can specify that a route value is of a certain type and also must fall within a certain range, like so: ``{age:int:range(1,120)}``. You can use the ``*`` character as a prefix to a route value name to bind to the rest of the URI. For example, ``blog/{*slug}`` would match any URI that started with ``/blog/`` and had any value following it (which would be assigned to the ``slug`` route value.
 
-Route templates must be unambiguous. It's not valid to have a route like ``{id?}/{foo}``, for instance. Typically optional route values will need to be at the end of the route template.
+Route templates must be unambiguous, or they will be ignored. For example, consider these two routes:
+
+1. ``{blog}/{year}/{month=1}``
+2. ``{blog}/{year}``
+
+The second route will never be used, since anything it would match will be matched by the first route (because it has a default value for month). If you wanted to construct a separate route that would for instance include all months or ask the user to select a month, you could change the route to include constant values, like this:
+
+1. ``monthly/{blog}/{year}/{month=1}``
+2. ``annual/{blog}/{year}``
 
 .. note:: There is a special case route for filenames, such that you can define a route value like ``files/{filename}.{ext?}``. When both ``filename`` and ``ext`` exist, both values will be populated. However, if only ``filename`` exists in the URL, the trailing period ``.`` is also optional. Thus, these would both match: ``/files/foo.txt`` and ``/files/foo``.
 
+.. tip:: Enable :doc:`logging` to see how the built in routing implementations, such as ``TemplateRoute``, match requests.
+
 Route Builder Extensions
 ------------------------
-Several `extension methods on RouteBuilder <https://github.com/aspnet/Routing/blob/1.0.0-rc1/src/Microsoft.AspNet.Routing/RouteBuilderExtensions.cs>`_ are available for convenience. The most common of these is ``MapRoute``, which allows the specification of a route given a name and template, and optionally default values and constraints.
+Several `extension methods on RouteBuilder <https://github.com/aspnet/Routing/blob/1.0.0-rc1/src/Microsoft.AspNet.Routing/RouteBuilderExtensions.cs>`_ are available for convenience. The most common of these is ``MapRoute``, which allows the specification of a route given a name and template, and optionally default values, constraints, and/or data tokens. When using these extensions, you must have specified the ``DefaultHandler`` and ``ServiceProvider`` properties of the ``RouteBuilder`` instance to which you're adding the route. These extensions all make use of the ``TemplateRoute`` type to add new route templates to whichever ``IRouter`` is configured to as the ``DefaultHandler``.
+
+.. note:: ``MapRoute`` doesn't take an ``IRouter`` parameter - it only adds routes to whatever the ``DefaultHandler`` is. This means that if the default is itself a route with named route value placeholders, only these placeholders can be used by routes defined using ``MapRoute``.
+
+If you want ``MapRoute`` to work for any route template, you'll need to ensure the ``DefaultHandler`` is set to use an ``IRouter`` instance that can accept any value. The following ``DelegateRouter`` accepts any values and displays them:
+
+.. literalinclude:: routing/sample/RoutingSample/DelegateRouter.cs
+  :linenos:
+  :language: c#
+
+You configure this ``IRouter`` implementation as the ``DefaultHandler`` for a ``RouteBuilder`` in the ``Configure`` method in ``Startup``:
+
+.. literalinclude:: routing/sample/RoutingSample/Startup.cs
+  :linenos:
+  :language: c#
+  :lines: 27-49
+  :dedent: 12
+  :emphasize-lines: 9,16
+
 
 Link Generation
 ---------------
 
+Routing is also used to generate URLs based on route definitions. This is used by helpers to generate links to known actions on controllers in ASP.NET MVC 6, but can also be used independent of MVC. Given a set of route values, and optionally a route name, you can produce a ``VirtualPathContext`` object. Using the ``VirtualPathContext`` object along with a ``RouteCollection``, you can generate a ``VirtualPath``.
+
+The example below shows how to generate a link to a route given a dictionary of route values and a ``RouteCollection``.
+
+.. literalinclude:: routing/sample/RoutingSample/Startup.cs
+  :linenos:
+  :language: c#
+  :lines: 45-69
+  :dedent: 8
+  :emphasize-lines: 9,14,17-18,23
+
+The ``VirtualPath`` generated on line XX is ``/package/create/123``.
+
+The second parameter to the ``VirtualPathContext`` constructor is a collection of ambient values. The current route values of the current request are considered ambient values for link generation. For example, in an MVC application if you are in the About action of the HomeController, you don't need to specify the controller route value to link to the Index action (the ambient value of HomeController will be used). Ambient values that don't match a parameter are ignored, and ambient values are also ignored when an explicitly-provided value overrides it, going from left to right in the URL.
+
+(add ambient values example table)
+
+Values that are explicitly provided but which don't match anything are added to the query string. (show example)
+
+If a route has default values that don't match a parameter and that value is explicitly provided, it must match the default value.
 
