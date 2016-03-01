@@ -226,7 +226,7 @@ You configure this ``IRouter`` implementation as the ``DefaultHandler`` for a ``
 Link Generation
 ---------------
 
-Routing is also used to generate URLs based on route definitions. This is used by helpers to generate links to known actions on controllers in ASP.NET MVC 6, but can also be used independent of MVC. Given a set of route values, and optionally a route name, you can produce a ``VirtualPathContext`` object. Using the ``VirtualPathContext`` object along with a ``RouteCollection``, you can generate a ``VirtualPath``.
+Routing is also used to generate URLs based on route definitions. This is used by helpers to generate links to known actions on controllers in ASP.NET MVC, but can also be used independent of MVC. Given a set of route values, and optionally a route name, you can produce a ``VirtualPathContext`` object. Using the ``VirtualPathContext`` object along with a ``RouteCollection``, you can generate a ``VirtualPath``.
 
 The example below shows how to generate a link to a route given a dictionary of route values and a ``RouteCollection``.
 
@@ -237,13 +237,38 @@ The example below shows how to generate a link to a route given a dictionary of 
   :dedent: 8
   :emphasize-lines: 9,14,17-18,23
 
-The ``VirtualPath`` generated on line XX is ``/package/create/123``.
+The ``VirtualPath`` generated on line 23 is ``/package/create/123``.
 
-The second parameter to the ``VirtualPathContext`` constructor is a collection of ambient values. The current route values of the current request are considered ambient values for link generation. For example, in an MVC application if you are in the About action of the HomeController, you don't need to specify the controller route value to link to the Index action (the ambient value of HomeController will be used). Ambient values that don't match a parameter are ignored, and ambient values are also ignored when an explicitly-provided value overrides it, going from left to right in the URL.
+The second parameter to the ``VirtualPathContext`` constructor is a collection of `ambient values`. Ambient values provide convenience by limiting the number of values a developer must specify within a certain request context. The current route values of the current request are considered ambient values for link generation. For example, in an MVC application if you are in the About action of the HomeController, you don't need to specify the controller route value to link to the Index action (the ambient value of HomeController will be used). 
 
-(add ambient values example table)
+Ambient values that don't match a parameter are ignored, and ambient values are also ignored when an explicitly-provided value overrides it, going from left to right in the URL.
 
-Values that are explicitly provided but which don't match anything are added to the query string. (show example)
+Values that are explicitly provided but which don't match anything are added to the query string.
 
-If a route has default values that don't match a parameter and that value is explicitly provided, it must match the default value.
+.. list-table:: Generating Links
+	:header-rows: 1
+
+	* - Matched Route
+	  - Ambient Values
+	  - Explicit Values
+	  - Result
+	* - ``{controller}/{action}/{id?}``
+	  - controller="Home"
+	  - action="About"
+	  - ``/Home/About``
+	* - ``{controller}/{action}/{id?}``
+	  - controller="Home"
+	  - controller="Order",action="About"
+	  - ``/Order/About``
+	* - ``{controller}/{action}/{id?}``
+	  - controller="Home",color="Red"
+	  - action="About"
+	  - ``/Home/About``
+	* - ``{controller}/{action}/{id?}``
+	  - controller="Home"
+	  - action="About",color="Red"
+	  - ``/Home/About?color=Red``
+
+If a route placeholder has a default value that doesn't match a parameter and that value is explicitly provided, it must match the default value.
+
 
