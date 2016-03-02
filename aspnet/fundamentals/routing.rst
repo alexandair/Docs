@@ -161,7 +161,6 @@ Adding a colon ``:`` after the name allows additional contraints to be set on a 
 	  - {age:max(120)}
 	  - 91
 	  - Value must be no more than 120.
-	  - Value must be at least 18.
 	* - ``range(min,max)``
 	  - {age:max(18,120)}
 	  - 91
@@ -174,7 +173,7 @@ Adding a colon ``:`` after the name allows additional contraints to be set on a 
 	  - {ssn:regex(\d{3}-\d{2}-\d{4})}
 	  - 123-45-6789
 	  - String must match the provided regular expression.
-	  * - ``required``
+	* - ``required``
 	  - {name:required}
 	  - Steve
 	  - Denotes a parameter is required; you need not specify this since it is the default.
