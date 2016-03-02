@@ -3,11 +3,11 @@ Publish to a Linux Production Environment
 
 By `Sourabh Shirhatti`_
 
-In this guide, we will cover setting up a production-ready ASP.NET environment on an Ubuntu 14.04 Server. Though we will cover the specifics of using Ubuntu 14.04, the content will be applicable to other flavors of Linux.
+In this guide, we will cover setting up a production-ready ASP.NET environment on an Ubuntu 14.04 Server.
 
 We will take an existing ASP.NET 5 application and place it behind a reverse-proxy server. We will then setup the reverse-proxy server to forward requests to our Kestrel web server.
 
-Additionally we will write a startup script to ensure our web application runs on startup as a daemon as well as a configure a process management tool to help restart our web application in the event of a crash to guarantee high availibility.
+Additionally we will ensure our web application runs on startup as a daemon and configure a process management tool to help restart our web application in the event of a crash to guarantee high availibility.
 
 .. contents:: Sections:
   :local:
@@ -20,7 +20,7 @@ Prerequisites
    sudo privilege.
 2. An exisiting ASP.NET 5 application.
 
-Before getting started you require LibUV. Follow the instructions on the :doc:`/getting-started/installing-on-linux` page.
+Before getting started you require the CoreCLR dependencies and LibUV. Follow the instructions on the :doc:`/getting-started/installing-on-linux` page.
 
 Copy over your app
 ------------------
@@ -176,7 +176,7 @@ Viewing logs
 
 .. code-block:: bash
 
-    tail -f /var/log/supervisor/supervisord.log
+    sudo tail -f /var/log/supervisor/supervisord.log
 
 You can redirect application logs (``STDOUT`` and ``STERR``) in the program section of your configuration file.
 
